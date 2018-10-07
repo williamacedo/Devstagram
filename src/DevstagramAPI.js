@@ -1,4 +1,4 @@
-const devUrl = '';
+const devUrl = 'https://alunos.b7web.com.br/apis/devstagram/';
 
 const DevstagramAPI = {
 

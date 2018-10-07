@@ -1,7 +1,45 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, TouchableHighlight } from 'react-native';
 
 export default class FeedItem extends Component {
+
+	constructor(props) {
+	  super(props);
+	
+	  let rawDate = this.props.data.date_posted.split(' ');
+
+	  let date = rawDate[0].split('-');
+	  date = date[2]+'.'+date[1]+'.'+date[0];
+
+	  let time = rawDate[1].split(':');
+	  time = time[0]+':'+time[0];
+
+	  this.state = {
+	  	dateFormatted:date+' '+time,
+	  	screenWidth:Dimensions.get('window').width
+	  };
+
+	  this.userClick = this.userClick.bind(this);
+	  this.photoClick = this.photoClick.bind(this);
+	  this.directLikeClick = this.directLikeClick.bind(this);
+	  this.toggleCommentArea = this.toggleCommentArea.bind(this);
+	}
+
+	userClick() {
+		alert("Clicou no usuario");
+	}
+
+	photoClick() {
+		alert("Clicou na foto");
+	}
+
+	directLikeClick() {
+		alert("deu o like");
+	}
+
+	toggleCommentArea() {
+		alert("clicou no comentario");
+	}
 
 	render() {
 
@@ -9,25 +47,40 @@ export default class FeedItem extends Component {
 			<View style={styles.feedContainer}>
 				<View style={styles.feedHeader}>
 					<View style={styles.avatar}>
-						<Image source={{uri:this.props.data.avatar}} style={styles.avatarImg} />
+						<TouchableHighlight onPress={this.userClick}>
+							<Image source={{uri:this.props.data.avatar}} style={styles.avatarImg} />
+						</TouchableHighlight>
 					</View>
-					<View style={styles.username}><Text>{this.props.data.name}</Text></View>
+					<View style={styles.username}>
+						<TouchableHighlight underlayColor={null} onPress={this.userClick}>
+							<Text>{this.props.data.name}</Text>
+						</TouchableHighlight>
+					</View>
 					<View style={styles.dateArea}>
-						<View style={styles.postDate}></View>
+						<Image source={require('../../assets/clock.png')}  style={styles.clockIcon} />
+						<Text style={styles.postDate}>{this.state.dateFormatted}</Text>
 					</View>
 					
 				</View>
 				<View style={styles.feedBody}>
-					<Image source={{uri:this.props.data.url}} style={styles.feedImage} />
+					<TouchableHighlight activeOpacity={1} underlayColor={null} onPress={this.photoClick}>
+						<Image resizeMode="cover" source={{uri:this.props.data.url}} style={{width: this.state.screenWidth, height: this.state.screenWidth}} />
+					</TouchableHighlight>
 				</View>
 				<View style={styles.feedFooter}>
+				<TouchableHighlight underlayColor={null} onPress={this.directLikeClick}>
 					<View style={styles.likeArea}>
-						<Text>{this.props.data.like_count}</Text>
+						<Image source={require('../../assets/like_off.png')} style={styles.footerIcon} />
+						<Text style={styles.likeText}>{this.props.data.like_count}</Text>
 					</View>
+				</TouchableHighlight>
+				<TouchableHighlight underlayColor={null} onPress={this.toggleCommentArea}>
 					<View style={styles.commentArea}>
-						<Text>{this.props.data.comments.length}</Text>
-					</View>					
-				</View>
+						<Image source={require('../../assets/comments.png')} style={styles.footerIcon} />
+						<Text style={styles.likeText}>{this.props.data.comments.length}</Text>
+					</View>	
+				</TouchableHighlight>				
+				</View>				
 				{this.props.data.comments.length > 0 &&
 					<View style={styles.commentsContainer}>
 						{this.props.data.comments.map((citem) => {
@@ -71,38 +124,56 @@ const styles = StyleSheet.create({
 	username:{
 		width: 150,
 		height: 25,
+		fontSize: 14
 	},
 	dateArea:{
 		flex: 1,
-		alignItems: 'flex-end'
+		flexDirection: 'row',
+		justifyContent: 'flex-end',
+		alignItems: 'center'
+	},
+	clockIcon:{
+		width: 15,
+		height: 15,
+		marginRight: 10
 	},
 	postDate:{
-		width: 80,
 		height: 20,
-		backgroundColor: '#00FF00',
-		marginRight: 10		
+		marginRight: 10	,
+		fontSize: 14	
 	},
 	feedBody:{
 		flex: 1,
-		backgroundColor: '#00FF00'
-	},
-	feedImage:{
-		width: 300,
-		height: 300
+		backgroundColor: '#EEEEEE'
 	},
 	feedFooter:{
 		height: 60,
-		flexDirection: 'row'
+		flexDirection: 'row',
+		justifyContent: 'flex-end'
 	},
 	likeArea:{
-		width: 60,
+		flexDirection: 'row',
 		height: 60,
-		backgroundColor: '#CCCCCC'
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingLeft: 20,
+		paddingRight: 20
 	},
 	commentArea:{
-		width: 60,
+		flexDirection: 'row',
 		height: 60,
-		backgroundColor: '#CCCCCC'		
+		justifyContent: 'center',
+		alignItems: 'center',
+		paddingLeft: 20,
+		paddingRight: 20		
+	},
+	footerIcon:{
+		width: 25,
+		height: 25,
+		marginRight: 10
+	},
+	likeText:{
+		fontSize: 18
 	},
 	commentsContainer:{
 		padding: 10
