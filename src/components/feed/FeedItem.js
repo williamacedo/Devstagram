@@ -16,21 +16,45 @@ export default class FeedItem extends Component {
 
 	  this.state = {
 	  	dateFormatted:date+' '+time,
-	  	screenWidth:Dimensions.get('window').width
+	  	screenWidth:Dimensions.get('window').width,
+	  	photoClickCount:0
 	  };
 
 	  this.userClick = this.userClick.bind(this);
 	  this.photoClick = this.photoClick.bind(this);
 	  this.directLikeClick = this.directLikeClick.bind(this);
 	  this.toggleCommentArea = this.toggleCommentArea.bind(this);
+	  this.commetUserClick = this.commetUserClick.bind(this);
 	}
 
 	userClick() {
-		alert("Clicou no usuario");
+		this.props.nav.navigate('Profile', {
+			name:this.props.data.name,
+			id: this.props.data.id_user
+		});
+	}
+
+	commetUserClick(name, id) {
+		this.props.nav.navigate('Profile', {
+			name:name,
+			id:id
+		});		
 	}
 
 	photoClick() {
-		alert("Clicou na foto");
+		let state = this.state;
+		state.photoClickCount++;
+		this.setState(state);
+
+		if(state.photoClickCount == 2){
+			this.directLikeClick();
+		}
+
+		setTimeout(() => {
+			let state = this.state;
+			state.photoClickCount = 0;
+			this.setState(state);		  
+		}, 500)
 	}
 
 	directLikeClick() {
@@ -53,7 +77,7 @@ export default class FeedItem extends Component {
 					</View>
 					<View style={styles.username}>
 						<TouchableHighlight underlayColor={null} onPress={this.userClick}>
-							<Text>{this.props.data.name}</Text>
+							<Text>{this.props.data.name} {this.state.photoClickCount}</Text>
 						</TouchableHighlight>
 					</View>
 					<View style={styles.dateArea}>
@@ -85,7 +109,12 @@ export default class FeedItem extends Component {
 					<View style={styles.commentsContainer}>
 						{this.props.data.comments.map((citem) => {
 							return (
-								<Text>{citem.name}: {citem.txt}</Text>
+								<View style={styles.commentItem}>
+									<TouchableHighlight underlayColor={null} onPress={() => { this.commetUserClick(citem.name, citem.id_user) }} style={styles.commentItemUser}>
+										<Text>{citem.name}:</Text>
+									</TouchableHighlight>
+									<Text>{citem.txt}</Text>
+								</View>
 							);
 						})}
 					</View>
@@ -166,6 +195,12 @@ const styles = StyleSheet.create({
 		alignItems: 'center',
 		paddingLeft: 20,
 		paddingRight: 20		
+	},
+	commentItem:{
+		flexDirection: 'row'
+	},
+	commentItemUser:{
+		marginRight: 5
 	},
 	footerIcon:{
 		width: 25,
